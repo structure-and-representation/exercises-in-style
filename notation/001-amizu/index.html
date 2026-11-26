@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>記譜法を借りる　第1番　編み図｜日本の人口を、22段で編む</title>
+<meta name="description" content="棒針編みの編み図の文法を借りて、国勢調査による日本の人口の100年を、22段の編み地として書く。">
+<style>
+:root{
+  --paper:#f4f1ea; --ink:#1d1d1b; --soft:#6b6860; --red:#c8452f;
+  --serif:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  --sans:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.85;font-size:16px}
+.wrap{max-width:992px;margin:0 auto;padding:28px 24px 56px}
+a{color:var(--ink);text-underline-offset:3px;text-decoration-color:var(--soft)}
+a:hover{text-decoration-color:var(--ink)}
+
+header .series{margin:0;font-family:var(--sans);font-size:13px;letter-spacing:.08em;color:var(--soft)}
+header h1{margin:6px 0 14px;font-size:30px;line-height:1.35;font-weight:600;letter-spacing:.04em}
+header .lead{margin:0 0 20px;max-width:40em}
+
+#chartWrap{margin:8px 0 0;border-top:1px solid rgba(29,29,27,.18);border-bottom:1px solid rgba(29,29,27,.18);padding:2px 0}
+#chart{display:block;width:100%;height:auto;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;cursor:crosshair}
+#chart:focus{outline:none}
+#chart:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+
+.hrule,.vrule{fill:none;stroke:#1d1d1b;stroke-width:1}
+.hrule{stroke-opacity:.15}
+.vrule{stroke-opacity:.11}
+.band{fill:#1d1d1b;fill-opacity:0}
+.band.on{fill-opacity:.055}
+.fab{fill:#1d1d1b;fill-opacity:.07}
+.kfill{fill:#34332f}
+.kv{fill:none;stroke:#2c2b27;stroke-linejoin:round;stroke-linecap:butt}
+.ksym{fill:none;stroke:#6b6860;stroke-opacity:.55;stroke-width:1;stroke-linecap:round}
+.sym path{fill:none;stroke:#6b6860;stroke-opacity:.62;stroke-linecap:round;stroke-linejoin:round}
+.sym.done path{stroke:#1d1d1b;stroke-opacity:1}
+.sym.done.red path{stroke:#c8452f}
+#chart[data-mode=full] .sym.done path{stroke-width:1.5}
+#chart[data-mode=simple] .sym.done path{stroke-width:1.3}
+.rownum{font-family:var(--sans);font-size:10px;fill:#6b6860;fill-opacity:.8}
+.yr{font-family:var(--sans);fill:#1d1d1b;font-variant-numeric:tabular-nums;opacity:0}
+.yr.show{opacity:1}
+.arrow{fill:none;stroke:#1d1d1b;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.needle{stroke:#1d1d1b;stroke-width:1.6;stroke-linecap:round}
+@media (prefers-reduced-motion:no-preference){
+  .yr{transition:opacity .6s ease}
+  .arrow.l{animation:nudgeL 1.4s ease-in-out infinite}
+  .arrow.r{animation:nudgeR 1.4s ease-in-out infinite}
+}
+@keyframes nudgeL{0%,100%{transform:translateX(0)}50%{transform:translateX(-4px)}}
+@keyframes nudgeR{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+
+.caption{margin:10px 0 0;font-family:var(--sans);font-size:14px;line-height:1.7;min-height:1.7em}
+.controls{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:8px 0 0}
+.keys{font-family:var(--sans);font-size:12px;color:var(--soft)}
+button{font:inherit;font-family:var(--sans);font-size:14px;color:var(--ink);background:transparent;border:1px solid var(--ink);border-radius:2px;padding:8px 16px;cursor:pointer;min-height:40px}
+button:hover{background:rgba(29,29,27,.06)}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+h2{font-size:18px;margin:0 0 8px;font-weight:600;letter-spacing:.04em}
+section{margin-top:36px}
+.legend ul{list-style:none;margin:0 0 8px;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:6px 20px}
+.legend li{display:flex;gap:10px;align-items:center;font-size:14px;line-height:1.5}
+.legend svg{flex:none;background:rgba(29,29,27,.035);border:1px solid rgba(29,29,27,.14)}
+.legend .scale{font-family:var(--sans);font-size:14px;margin:10px 0 0}
+.legend .simplenote{display:none;font-size:13px;color:var(--soft);margin:6px 0 0}
+.legend .simplenote.on{display:block}
+
+.notes ul,.sources ul{margin:0;padding-left:1.3em;font-size:14px}
+.notes li,.sources li{margin:2px 0}
+.sources .urls{font-family:var(--sans);font-size:12px;word-break:break-all}
+
+#answer .peekrow{margin:0}
+#answerBody{margin-top:12px}
+#answerBody[hidden]{display:none}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;font-family:var(--sans);font-size:13px;width:100%;max-width:640px;font-variant-numeric:tabular-nums}
+caption{text-align:left;font-size:12px;color:var(--soft);padding-bottom:6px}
+th,td{padding:4px 8px;text-align:right;border-bottom:1px solid rgba(29,29,27,.14);white-space:nowrap}
+thead th{font-weight:600;border-bottom:1px solid var(--ink);font-size:12px}
+tbody th{font-weight:400;color:var(--soft)}
+.tnote{font-size:13px;margin:8px 0 0}
+
+footer{margin-top:40px;padding-top:18px;border-top:1px solid rgba(29,29,27,.18);font-size:14px}
+footer p{margin:6px 0}
+footer .back{font-family:var(--sans);margin-top:16px}
+
+@media (max-width:640px){
+  .wrap{padding:20px 16px 48px}
+  header h1{font-size:24px}
+  #chartWrap{margin-left:-16px;margin-right:-16px}
+  th,td{padding:4px 5px}
+  table{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="series">記譜法を借りる　第1番　編み図</p>
+  <h1>日本の人口を、22段で編む</h1>
+  <p class="lead">棒針編みの編み図の文法を借りて、国勢調査1回を1段、100万人を1目として、日本の人口の100年を一枚の編み地に書きました。1段目（1920年）をいちばん下に置き、矢印のある端から反対の端まで、1段ずつなぞって編んでください（奇数段は右から左へ、偶数段は左から右へ）。なぞる距離が、その5年間の人口の大きさです。</p>
+</header>
+
+<main>
+  <div id="chartWrap">
+    <svg id="chart" tabindex="0" role="img" aria-label="日本の人口の100年を22段の編み図で書いた図。1段目を下に置き、矢印のある端から反対の端までなぞって編む。キーボードでは右矢印またはEnterで1目ずつ編む。"></svg>
+  </div>
+  <p id="caption" class="caption" aria-live="polite"></p>
+  <div class="controls">
+    <button id="reset" type="button">最初からやり直す</button>
+    <span class="keys">キーボード：→ または Enter で1目、Shift を押しながらで1段</span>
+  </div>
+
+  <section class="legend" aria-labelledby="lgh">
+    <h2 id="lgh">凡例</h2>
+    <ul>
+      <li><svg data-sym="knit" width="26" height="34" aria-hidden="true"></svg><span>表目（編むとV字の目になる）</span></li>
+      <li><svg data-sym="yo" width="26" height="34" aria-hidden="true"></svg><span>かけ目（増し目）</span></li>
+      <li><svg data-sym="dec-l" width="26" height="34" aria-hidden="true"></svg><span>左上2目一度（減らし目）：段の右半分に置く</span></li>
+      <li><svg data-sym="dec-r" width="26" height="34" aria-hidden="true"></svg><span>右上2目一度（減らし目）：段の左半分に置く</span></li>
+      <li><svg data-sym="v" width="26" height="34" aria-hidden="true"></svg><span>編まれた目（メリヤス編み）</span></li>
+      <li><svg data-sym="red" width="26" height="34" aria-hidden="true"></svg><span>人口が減った段では、編むと減らし目が朱に変わる</span></li>
+    </ul>
+    <p class="scale">1目＝100万人、1段＝5年</p>
+    <p class="simplenote" id="simplenote">この画面の編み図は簡略表示です。表目は地のまま、かけ目は小さな丸、減らし目は斜めの短い線（左上は「／」、右上は「＼」）で示しています。</p>
+  </section>
+
+  <section class="notes" aria-labelledby="nh">
+    <h2 id="nh">注記</h2>
+    <ul>
+      <li>1945年は国勢調査ではなく人口調査による補正人口で、沖縄県を含みません。</li>
+      <li>編み図の記号は JIS L 0201（編目記号）にならって描きました。原典との照合はまだ済んでいません。</li>
+      <li>目数は人口を100万人単位に四捨五入した値です。段と段の目数の差が、増し目（かけ目）と減らし目の数になり、段の中に左右へ均等に散らして置いています。1段目は前の段がないため、すべて表目です。</li>
+      <li>2025年の人口は千人単位の公表値です。</li>
+    </ul>
+  </section>
+
+  <section id="answer" aria-labelledby="ah">
+    <h2 id="ah">答え合わせ</h2>
+    <p class="peekrow"><button id="peek" type="button" aria-expanded="false" aria-controls="answerBody">答え合わせを先に見る</button></p>
+    <div id="answerBody" hidden>
+      <p id="answerLead" class="tnote" style="margin:0 0 8px"></p>
+      <div class="tablewrap">
+        <table id="ans">
+          <thead><tr><th scope="col">段</th><th scope="col">年</th><th scope="col">人口（人）</th><th scope="col">目数</th><th scope="col">前の段から（目）</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="tnote" id="ansTotal"></p>
+      <p class="tnote">※1945年は国勢調査ではなく、人口調査による補正人口（沖縄県を含まない）。<br>※2025年は千人単位の公表値。</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <section class="sources" style="margin-top:0">
+    <p><strong>出典</strong>：総務省統計局「国勢調査」</p>
+    <ul class="urls" id="urls"></ul>
+  </section>
+  <p><strong>着想元</strong>：<a href="https://www.tempestryproject.com/about/" rel="noopener">Tempestry Project</a>（気温データを編む先例）</p>
+  <p>制作：Claude（Anthropic）／企画・監修：矢崎裕一</p>
+  <p class="back"><a href="../../">トップへ戻る</a></p>
+</footer>
+</div>
+
+<noscript><p style="padding:16px">この作品の表示にはJavaScriptが必要です。</p></noscript>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- データ（総務省統計局「国勢調査」、README の約束6により埋め込み） ---------- */
+var CENSUS = {
+  "title": "日本の総人口（国勢調査、5年ごと）",
+  "source": "総務省統計局「国勢調査」",
+  "urls": [
+    "https://www.stat.go.jp/data/kokusei/2015/kouhou/ayumi.html",
+    "https://www.stat.go.jp/data/kokusei/2020/kekka/pdf/summary_01.pdf",
+    "https://www.stat.go.jp/data/kokusei/2025/kekka/pdf/summary_01.pdf"
+  ],
+  "rows": [
+    {"year": 1920, "pop": 55963053},
+    {"year": 1925, "pop": 59736822},
+    {"year": 1930, "pop": 64450005},
+    {"year": 1935, "pop": 69254148},
+    {"year": 1940, "pop": 73114308},
+    {"year": 1945, "pop": 71998104, "flag": "人口調査"},
+    {"year": 1950, "pop": 84114574},
+    {"year": 1955, "pop": 90076594},
+    {"year": 1960, "pop": 94301623},
+    {"year": 1965, "pop": 99209137},
+    {"year": 1970, "pop": 104665171},
+    {"year": 1975, "pop": 111939643},
+    {"year": 1980, "pop": 117060396},
+    {"year": 1985, "pop": 121048923},
+    {"year": 1990, "pop": 123611167},
+    {"year": 1995, "pop": 125570246},
+    {"year": 2000, "pop": 126925843},
+    {"year": 2005, "pop": 127767994},
+    {"year": 2010, "pop": 128057352},
+    {"year": 2015, "pop": 127094745},
+    {"year": 2020, "pop": 126146099},
+    {"year": 2025, "pop": 122973000, "flag": "千人単位"}
+  ]
+};
+
+var NS = 'http://www.w3.org/2000/svg';
+var ROWS = CENSUS.rows;
+var NR = ROWS.length;                                   /* 22段 */
+var N = ROWS.map(function(r){ return Math.round(r.pop / 1e6); });   /* 段ごとの目数 */
+var D = N.map(function(n, i){ return i ? n - N[i-1] : 0; });         /* 前の段との差 */
+var MAXC = Math.max.apply(null, N);                     /* 128 */
+
+/* 各段の「かけ目／2目一度」の位置を、段の中に均等に散らして決める */
+var SP = N.map(function(n, i){
+  var d = D[i], k = Math.abs(d), out = [];
+  for (var j = 0; j < k; j++){
+    var idx = Math.floor((j + 0.5) * n / k);
+    var type = d > 0 ? 'yo' : (idx >= n / 2 ? 'dec-l' : 'dec-r');   /* 右半分＝左上2目一度（人）、左半分＝右上2目一度（入） */
+    out.push({idx: idx, type: type});
+  }
+  return out;
+});
+var KNIT = N.map(function(n, i){
+  var taken = {}; SP[i].forEach(function(s){ taken[s.idx] = 1; });
+  var a = []; for (var x = 0; x < n; x++) if (!taken[x]) a.push(x);
+  return a;
+});
+
+/* 奇数段（index 0, 2, …）は右から左（-1）、偶数段は左から右（+1） */
+function dirOf(r){ return r % 2 === 0 ? -1 : 1; }
+
+/* ---------- 状態 ---------- */
+var S = {rows: 0, m: 0};
+var G = null, REF = [], arrowEl = null, needleEl = null, drag = null;
+var svg = document.getElementById('chart');
+var wrap = document.getElementById('chartWrap');
+var caption = document.getElementById('caption');
+var peekBtn = document.getElementById('peek');
+var answerBody = document.getElementById('answerBody');
+
+function publish(){
+  window.__state = {rows: S.rows, stitches: S.m, total: NR, done: S.rows >= NR};
+}
+
+/* ---------- 記号の図形 ---------- */
+function f(v){ return Math.round(v * 100) / 100; }
+
+/* 記号の path。cell は左上 (x, y)、幅 w、高さ h。simple はスマートフォン向けの簡略表示 */
+function symPath(type, x, y, w, h, simple){
+  var cx = x + w / 2, cy = y + h / 2, d;
+  if (simple){
+    if (type === 'yo'){
+      var r0 = Math.max(0.85, w * 0.36);
+      return circle(cx, cy, r0);
+    }
+    var a0 = Math.max(0.95, w * 0.42), t = y + h * 0.2, b = y + h * 0.8;
+    return type === 'dec-l'
+      ? 'M' + f(cx + a0) + ' ' + f(t) + 'L' + f(cx - a0) + ' ' + f(b)    /* 人の長い画 ／ */
+      : 'M' + f(cx - a0) + ' ' + f(t) + 'L' + f(cx + a0) + ' ' + f(b);   /* 入の長い画 ＼ */
+  }
+  var y0 = y + h * 0.16, H = h * 0.68, a = w * 0.4;
+  function P(u, v){ return f(cx + u * a) + ' ' + f(y0 + v * H); }
+  if (type === 'knit'){
+    return 'M' + f(cx) + ' ' + f(y + h * 0.14) + 'L' + f(cx) + ' ' + f(y + h * 0.86);
+  }
+  if (type === 'yo'){
+    return circle(cx, cy, Math.min(w * 0.34, h * 0.27));
+  }
+  if (type === 'dec-l'){   /* 左上2目一度：「人」 */
+    d = 'M' + P(0.2, 0) + 'L' + P(-1, 1);
+    d += 'M' + P(0.2 - 1.2 * 0.4, 0.4) + 'L' + P(1, 1);
+    return d;
+  }
+  /* 'dec-r' 右上2目一度：「入」 */
+  d = 'M' + P(-0.25, 0) + 'L' + P(-1, 0.72);
+  d += 'M' + P(-0.25 - 0.75 * 0.3, 0.216) + 'L' + P(1, 1);
+  return d;
+}
+function circle(cx, cy, r){
+  return 'M' + f(cx - r) + ' ' + f(cy) + 'a' + f(r) + ' ' + f(r) + ' 0 1 0 ' + f(2 * r) + ' 0a' + f(r) + ' ' + f(r) + ' 0 1 0 ' + f(-2 * r) + ' 0';
+}
+/* メリヤス編みのV字の目 */
+function vPath(x, y, w, h){
+  return 'M' + f(x + w * 0.14) + ' ' + f(y + h * 0.2) + 'L' + f(x + w / 2) + ' ' + f(y + h * 0.82) + 'L' + f(x + w * 0.86) + ' ' + f(y + h * 0.2);
+}
+
+function el(tag, attrs, parent){
+  var e = document.createElementNS(NS, tag);
+  for (var k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+/* ---------- 幾何 ---------- */
+function geom(){
+  var W = Math.max(300, Math.floor(wrap.clientWidth));
+  var gut = 52, c = (W - 2 * gut) / MAXC;
+  if (c < 4.2){ gut = 20; c = (W - 2 * gut) / MAXC; }
+  c = Math.min(c, 6.5);
+  var simple = c < 4.2;
+  var h = simple ? 14 : 16;
+  var top = 12, bot = 10;
+  return {W: W, c: c, h: h, gut: gut, simple: simple, top: top, H: top + NR * h + bot, cx: W / 2};
+}
+function rowLeft(r){ return G.cx - N[r] * G.c / 2; }
+function rowRight(r){ return G.cx + N[r] * G.c / 2; }
+function rowTop(r){ return G.top + (NR - 1 - r) * G.h; }
+function startX(r){ return dirOf(r) < 0 ? rowRight(r) : rowLeft(r); }
+function knitted(r){ return r < S.rows ? N[r] : (r === S.rows ? S.m : 0); }
+function range(r){ var n = N[r], m = knitted(r); return dirOf(r) < 0 ? [n - m, n] : [0, m]; }
+
+/* ---------- 描画 ---------- */
+function build(){
+  G = geom();
+  svg.replaceChildren();
+  svg.setAttribute('viewBox', '0 0 ' + G.W + ' ' + G.H);
+  svg.setAttribute('width', G.W);
+  svg.setAttribute('height', G.H);
+  svg.dataset.mode = G.simple ? 'simple' : 'full';
+  svg.dataset.cell = f(G.c);
+  svg.dataset.rowHeight = G.h;
+
+  var hd = '';
+  for (var i = 0; i <= NR; i++){ var yy = f(G.top + i * G.h) ; hd += 'M0 ' + yy + 'H' + G.W; }
+  el('path', {'class': 'hrule', d: hd}, svg);
+
+  REF = [];
+  for (var r = 0; r < NR; r++){
+    var n = N[r], left = rowLeft(r), y = rowTop(r);
+    var g = el('g', {'class': 'row', 'data-row': r + 1, 'data-year': ROWS[r].year, 'data-n': n, 'data-knit': KNIT[r].length, 'data-diff': D[r]}, svg);
+    var R = {g: g};
+    R.band = el('rect', {'class': 'band', x: 0, y: y, width: G.W, height: G.h}, g);
+    if (!G.simple){
+      var vd = '';
+      for (var j = 0; j <= n; j++) vd += 'M' + f(left + j * G.c) + ' ' + f(y) + 'V' + f(y + G.h);
+      el('path', {'class': 'vrule', d: vd}, g);
+    }
+    R.fab = el('rect', {'class': 'fab', x: 0, y: y, width: 0, height: G.h}, g);
+    if (G.simple){
+      R.kfill = el('path', {'class': 'kfill', d: ''}, g);
+    } else {
+      R.kv = el('path', {'class': 'kv', 'stroke-width': f(G.c * 0.29), d: ''}, g);
+      R.ksym = el('path', {'class': 'ksym', d: ''}, g);
+    }
+    R.syms = SP[r].map(function(s, q){
+      var gs = el('g', {'class': 'sym ' + (s.type === 'yo' ? 'yo' : 'dec ' + s.type), 'data-row': r + 1, 'data-col': s.idx, 'data-type': s.type}, g);
+      var sw = G.simple ? 0.9 : 1;
+      el('path', {d: symPath(s.type, left + s.idx * G.c, y, G.c, G.h, G.simple), 'stroke-width': sw}, gs);
+      return {el: gs, idx: s.idx};
+    });
+    /* 段数（PC のみ）：編み始める側の外縁に */
+    if (!G.simple){
+      var odd = (dirOf(r) < 0);
+      var t = el('text', {'class': 'rownum', x: odd ? G.W - 8 : 8, y: f(y + G.h / 2 + 3.5), 'text-anchor': odd ? 'end' : 'start'}, g);
+      t.textContent = r + 1;
+    }
+    /* 年：編み終えた側に */
+    var left0 = dirOf(r) < 0;
+    var yx = left0 ? rowLeft(r) - (G.simple ? 1.5 : 7) : rowRight(r) + (G.simple ? 1.5 : 7);
+    var ya = {'class': 'yr', x: f(yx), y: f(y + G.h / 2 + (G.simple ? 3 : 4.2)), 'text-anchor': left0 ? 'end' : 'start', 'font-size': G.simple ? 8 : 12, 'data-year': ROWS[r].year};
+    if (G.simple){ ya.textLength = 17; ya.lengthAdjust = 'spacingAndGlyphs'; }
+    R.year = el('text', ya, g);
+    R.year.textContent = ROWS[r].year;
+    REF.push(R);
+  }
+  needleEl = el('path', {'class': 'needle', d: ''}, svg);
+  arrowEl = el('path', {'class': 'arrow', d: ''}, svg);
+  for (var q = 0; q < NR; q++) updateRow(q);
+  chrome();
+}
+
+function updateRow(r){
+  var R = REF[r], n = N[r], left = rowLeft(r), y = rowTop(r), c = G.c, h = G.h;
+  var rg = range(r), lo = rg[0], hi = rg[1];
+  if (hi > lo){
+    R.fab.setAttribute('x', f(left + lo * c));
+    R.fab.setAttribute('width', f((hi - lo) * c));
+  } else {
+    R.fab.setAttribute('width', 0);
+  }
+  var kd = '', sd = '', vd = '', i, runStart = -1;
+  var K = KNIT[r];
+  if (G.simple){
+    /* 編まれた表目を、隣り合う目ごとにまとめて塗る */
+    for (var q = 0; q <= K.length; q++){
+      var idx = q < K.length ? K[q] : -2;
+      var inK = q < K.length && idx >= lo && idx < hi;
+      if (inK){
+        if (runStart < 0) runStart = idx;
+        var next = (q + 1 < K.length) ? K[q + 1] : -2;
+        if (next !== idx + 1 || !(next >= lo && next < hi)){
+          kd += 'M' + f(left + runStart * c) + ' ' + f(y + 1) + 'h' + f((idx - runStart + 1) * c) + 'v' + f(h - 2) + 'h' + f(-(idx - runStart + 1) * c) + 'z';
+          runStart = -1;
+        }
+      }
+    }
+    R.kfill.setAttribute('d', kd);
+  } else {
+    for (i = 0; i < K.length; i++){
+      var ix = K[i], cx0 = left + ix * c;
+      if (ix >= lo && ix < hi) vd += vPath(cx0, y, c, h);
+      else sd += symPath('knit', cx0, y, c, h, false);
+    }
+    R.kv.setAttribute('d', vd);
+    R.ksym.setAttribute('d', sd);
+  }
+  var red = D[r] < 0;
+  R.syms.forEach(function(s){
+    var done = s.idx >= lo && s.idx < hi;
+    s.el.classList.toggle('done', done);
+    s.el.classList.toggle('red', done && red);
+  });
+  R.year.classList.toggle('show', r < S.rows);
+}
+
+function chrome(){
+  var r = S.rows, complete = r >= NR;
+  for (var i = 0; i < NR; i++) REF[i].band.classList.toggle('on', i === r);
+  if (complete){
+    arrowEl.setAttribute('d', ''); needleEl.setAttribute('d', '');
+  } else {
+    var dir = dirOf(r), y = rowTop(r), cy = y + G.h / 2;
+    var sx = startX(r), n = N[r];
+    if (S.m === 0){
+      var L = G.simple ? 12 : 18, hd = G.simple ? 4.5 : 6, gap = G.simple ? 3 : 5;
+      var tip = sx - dir * gap, tail = tip - dir * L, arm = tip - dir * hd;
+      arrowEl.setAttribute('d', 'M' + f(tail) + ' ' + f(cy) + 'H' + f(tip) + 'M' + f(arm) + ' ' + f(cy - hd * 0.75) + 'L' + f(tip) + ' ' + f(cy) + 'L' + f(arm) + ' ' + f(cy + hd * 0.75));
+      arrowEl.setAttribute('class', 'arrow ' + (dir < 0 ? 'l' : 'r'));
+      needleEl.setAttribute('d', '');
+    } else {
+      var fx = sx + dir * S.m * G.c;
+      needleEl.setAttribute('d', 'M' + f(fx) + ' ' + f(y - 3) + 'V' + f(y + G.h + 3));
+      arrowEl.setAttribute('d', '');
+    }
+  }
+  var way = function(rr){ return dirOf(rr) < 0 ? '右から左へ' : '左から右へ'; };
+  if (complete){
+    caption.textContent = '22段、編み上がりました。下に答え合わせを出しました。';
+  } else if (S.m === 0){
+    caption.textContent = (r + 1) + '段目：矢印の端から、' + way(r) + 'なぞって編みます。';
+  } else {
+    caption.textContent = (r + 1) + '段目：' + way(r) + 'なぞっています。';
+  }
+  /* 答え合わせ */
+  if (complete){
+    answerBody.hidden = false;
+    peekBtn.hidden = true;
+    peekBtn.setAttribute('aria-expanded', 'true');
+    document.getElementById('answerLead').textContent = '22段すべてを編み終えました。1目＝100万人、1段＝5年です。';
+  } else if (!peekedOpen){
+    answerBody.hidden = true;
+    peekBtn.hidden = false;
+    peekBtn.setAttribute('aria-expanded', 'false');
+    peekBtn.textContent = '答え合わせを先に見る';
+    document.getElementById('answerLead').textContent = '';
+  } else {
+    peekBtn.hidden = false;
+    peekBtn.textContent = '答え合わせを閉じる';
+    document.getElementById('answerLead').textContent = '先に見る：編み終えていない段も含めた一覧です。';
+  }
+  publish();
+}
+
+/* ---------- 編み進める ---------- */
+function completeRow(){
+  var r = S.rows;
+  S.rows = r + 1; S.m = 0;
+  updateRow(r);
+  if (S.rows < NR) updateRow(S.rows);
+  if (drag) drag.engaged = false;
+  chrome();
+}
+function setStitches(m){
+  var r = S.rows, n = N[r];
+  if (m <= S.m) return;
+  if (m >= n){ completeRow(); return; }
+  S.m = m;
+  updateRow(r);
+  chrome();
+}
+function step(wholeRow){
+  if (S.rows >= NR) return;
+  if (wholeRow) completeRow(); else setStitches(S.m + 1);
+}
+
+function local(e){
+  var b = svg.getBoundingClientRect(), k = G.W / b.width;
+  return {x: (e.clientX - b.left) * k, y: (e.clientY - b.top) * k};
+}
+function inBand(y, k){
+  var cy = rowTop(S.rows) + G.h / 2;
+  return Math.abs(y - cy) <= G.h * k;
+}
+function frontierX(){ return startX(S.rows) + dirOf(S.rows) * S.m * G.c; }
+function tol(){ return Math.max(30, G.c * 5); }
+function stitchesAt(x){
+  var r = S.rows, s = dirOf(r) < 0 ? (rowRight(r) - x) / G.c : (x - rowLeft(r)) / G.c;
+  return Math.round(s);
+}
+
+svg.addEventListener('pointerdown', function(e){
+  if (S.rows >= NR) return;
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  var p = local(e);
+  if (!inBand(p.y, 0.9) || Math.abs(p.x - frontierX()) > tol()) return;
+  drag = {id: e.pointerId, engaged: true};
+  try { svg.setPointerCapture(e.pointerId); } catch (_) {}
+  e.preventDefault();
+  setStitches(stitchesAt(p.x));
+});
+svg.addEventListener('pointermove', function(e){
+  if (!drag || e.pointerId !== drag.id || S.rows >= NR) return;
+  var p = local(e);
+  if (!inBand(p.y, 1.3)){ drag.engaged = false; return; }
+  if (!drag.engaged){
+    if (Math.abs(p.x - frontierX()) <= tol()) drag.engaged = true; else return;
+  }
+  setStitches(stitchesAt(p.x));
+  e.preventDefault();
+});
+function endDrag(e){
+  if (!drag || e.pointerId !== drag.id) return;
+  var d = drag; drag = null;
+  if (d.engaged && S.rows < NR && S.m > 0){
+    var slack = Math.max(2, Math.ceil(8 / G.c));      /* あと数目なら、最後まで編み上げる */
+    if (N[S.rows] - S.m <= slack) completeRow();
+  }
+}
+svg.addEventListener('pointerup', endDrag);
+svg.addEventListener('pointercancel', endDrag);
+svg.addEventListener('lostpointercapture', function(e){ if (drag && e.pointerId === drag.id) drag = null; });
+
+document.addEventListener('keydown', function(e){
+  if (e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key !== 'ArrowRight' && e.key !== 'Enter') return;
+  var t = e.target;
+  if (t && t.closest && t.closest('button,a,input,select,textarea,summary')) return;
+  if (S.rows >= NR) return;
+  e.preventDefault();
+  step(e.shiftKey);
+});
+
+/* ---------- ボタン ---------- */
+var peekedOpen = false;
+peekBtn.addEventListener('click', function(){
+  if (S.rows >= NR) return;
+  peekedOpen = !peekedOpen;
+  answerBody.hidden = !peekedOpen;
+  peekBtn.setAttribute('aria-expanded', peekedOpen ? 'true' : 'false');
+  chrome();
+});
+document.getElementById('reset').addEventListener('click', function(){
+  S.rows = 0; S.m = 0; drag = null; peekedOpen = false;
+  for (var i = 0; i < NR; i++) updateRow(i);
+  chrome();
+  var b = document.getElementById('reset'); b.blur();
+});
+
+/* ---------- 答え合わせの表 ---------- */
+(function(){
+  var tb = document.querySelector('#ans tbody'), total = 0;
+  ROWS.forEach(function(row, i){
+    var tr = document.createElement('tr');
+    tr.dataset.row = i + 1; tr.dataset.year = row.year; tr.dataset.pop = row.pop; tr.dataset.n = N[i]; tr.dataset.diff = i ? D[i] : '';
+    total += D[i];
+    var mark = (row.year === 1945 || row.year === 2025) ? '※' : '';
+    var diff = i === 0 ? '―' : (D[i] > 0 ? '+' + D[i] : (D[i] < 0 ? '−' + Math.abs(D[i]) : '0'));
+    tr.innerHTML = '<th scope="row">' + (i + 1) + '</th><td>' + row.year + mark + '</td><td>' + row.pop.toLocaleString('en-US') + '</td><td>' + N[i] + '</td><td>' + diff + '</td>';
+    tb.appendChild(tr);
+  });
+  document.getElementById('ansTotal').textContent = '1段目から22段目までの増減の合計：+' + total + '目（' + N[0] + '目から' + N[NR - 1] + '目へ）。1段目は作り目として、増減には数えません。';
+})();
+
+/* ---------- 出典リンク ---------- */
+(function(){
+  var ul = document.getElementById('urls');
+  CENSUS.urls.forEach(function(u){
+    var li = document.createElement('li'), a = document.createElement('a');
+    a.href = u; a.textContent = u; a.rel = 'noopener';
+    li.appendChild(a); ul.appendChild(li);
+  });
+})();
+
+/* ---------- 凡例の記号 ---------- */
+function buildLegend(){
+  document.querySelectorAll('.legend svg[data-sym]').forEach(function(s){
+    var kind = s.getAttribute('data-sym'), w = 26, h = 34;
+    s.replaceChildren();
+    s.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    var cw = 18, cx0 = (w - cw) / 2;
+    function stroke(d, color, sw){ el('path', {d: d, fill: 'none', stroke: color, 'stroke-width': sw, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'}, s); }
+    if (kind === 'v'){
+      stroke(vPath(cx0, 0, cw, h), '#2c2b27', 5.4);
+      stroke(vPath(cx0 - cw, 0, cw, h), '#2c2b27', 5.4);
+      stroke(vPath(cx0 + cw, 0, cw, h), '#2c2b27', 5.4);
+    } else if (kind === 'red'){
+      stroke(symPath('dec-l', cx0, 0, cw, h, false), '#c8452f', 1.9);
+    } else {
+      stroke(symPath(kind, cx0, 0, cw, h, false), '#1d1d1b', 1.7);
+    }
+  });
+}
+
+/* ---------- 起動 ---------- */
+var lastW = 0, raf = 0;
+function relayout(){
+  var w = Math.floor(wrap.clientWidth);
+  if (w === lastW && G) return;
+  lastW = w;
+  build();
+  document.getElementById('simplenote').classList.toggle('on', G.simple);
+}
+window.addEventListener('resize', function(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(relayout); });
+if (window.ResizeObserver) new ResizeObserver(function(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(relayout); }).observe(wrap);
+buildLegend();
+publish();
+relayout();
+})();
+</script>
+</body>
+</html>
