@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#111110">
+<title>音だけ｜データの文体練習 第2番</title>
+<style>
+  :root {
+    --bg: #111110;
+    --ink: #e9e6df;
+    --dim: #8d8a82;
+    --line: #34332f;
+    --accent: #c8452f;
+    --mincho: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+    --gothic: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--mincho);
+    font-size: 16px;
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+  }
+  a { color: var(--ink); text-underline-offset: 3px; text-decoration-color: var(--dim); }
+  a:hover { text-decoration-color: var(--ink); }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+
+  .sr {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  header { padding: 16px 16px 0; }
+  header h1 {
+    margin: 0;
+    font-family: var(--mincho);
+    font-weight: 400;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--dim);
+  }
+
+  .stage {
+    flex: 1 0 auto;
+    min-height: calc(100vh - 150px);
+    min-height: calc(100svh - 150px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    padding: 24px 16px;
+    text-align: center;
+  }
+  .line {
+    margin: 0;
+    font-size: clamp(18px, 5vw, 24px);
+    letter-spacing: 0.12em;
+    transition: opacity 0.4s;
+  }
+  .line.quiet { opacity: 0.3; }
+
+  .pad {
+    appearance: none;
+    -webkit-appearance: none;
+    display: block;
+    width: clamp(132px, 38vmin, 220px);
+    height: clamp(132px, 38vmin, 220px);
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid #4a4943;
+    background: rgba(233, 230, 223, 0.03);
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.18s, border-color 0.18s;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+  }
+  .pad.on {
+    background: rgba(233, 230, 223, 0.13);
+    border-color: var(--dim);
+  }
+  .pad[aria-disabled="true"] { opacity: 0.3; cursor: default; }
+
+  .below { padding: 0 16px; }
+  .peek {
+    appearance: none;
+    -webkit-appearance: none;
+    display: block;
+    margin: 0 auto;
+    padding: 10px 16px;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--dim);
+    font-family: var(--gothic);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+  .peek:hover { color: var(--ink); }
+
+  .answer { max-width: 640px; margin: 32px auto 0; }
+  .answer h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+  }
+  .answer h2:focus { outline: none; }
+  .answer p { margin: 0 0 16px; color: var(--dim); font-size: 14px; }
+
+  table { width: 100%; border-collapse: collapse; font-family: var(--gothic); font-size: 14px; }
+  th, td { padding: 0; border-bottom: 1px solid var(--line); text-align: right; font-weight: 400; vertical-align: middle; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { color: var(--dim); font-size: 12px; padding: 6px 0 6px 12px; white-space: nowrap; }
+  thead th:first-child { padding-left: 0; }
+  td.num { white-space: nowrap; padding: 8px 0 8px 12px; font-variant-numeric: tabular-nums; }
+  tfoot td { padding: 10px 0 10px 12px; border-bottom: 0; }
+  tfoot td:first-child { padding-left: 0; color: var(--dim); }
+
+  .row-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    width: 100%;
+    margin: 0;
+    padding: 8px 0 8px 10px;
+    background: none;
+    border: 0;
+    border-left: 2px solid transparent;
+    color: var(--ink);
+    font: inherit;
+    line-height: 1.5;
+    text-align: left;
+    cursor: pointer;
+  }
+  .row-btn:hover { background: rgba(233, 230, 223, 0.05); }
+  tr.playing .row-btn { border-left-color: var(--accent); background: rgba(233, 230, 223, 0.05); }
+  .tag { flex: none; color: var(--dim); font-size: 11px; letter-spacing: 0.04em; }
+
+  .again {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 20px 0 0;
+    padding: 10px 20px;
+    background: none;
+    border: 1px solid var(--dim);
+    border-radius: 999px;
+    color: var(--ink);
+    font-family: var(--gothic);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+  }
+  .again:hover { background: rgba(233, 230, 223, 0.08); }
+
+  footer {
+    width: min(640px, calc(100% - 32px));
+    margin: 48px auto 0;
+    padding: 20px 0 32px;
+    padding-bottom: max(32px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--dim);
+  }
+  footer p { margin: 0 0 8px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pad, .line { transition: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>データの文体練習　第2番　音だけ</h1>
+</header>
+
+<main class="stage">
+  <p class="line" id="line">長押しで、一日が鳴る。</p>
+  <button type="button" class="pad" id="pad" aria-pressed="false"
+    aria-label="一日を鳴らす。押している間だけ進み、離すと止まる。キーボードではスペースキーを押し続ける。"></button>
+</main>
+
+<p class="sr" id="live" aria-live="polite"></p>
+
+<div class="below">
+  <button type="button" class="peek" id="peek" aria-expanded="false" aria-controls="answer">答え合わせを先に見る</button>
+
+  <section class="answer" id="answer" aria-labelledby="answer-h" hidden>
+    <h2 id="answer-h" tabindex="-1">答え合わせ</h2>
+    <p>行を押すと、その行動の音を1秒だけ聴けます。</p>
+    <table>
+      <thead>
+        <tr><th scope="col">行動</th><th scope="col">鳴った秒数</th><th scope="col">時間</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+      <tfoot id="total"></tfoot>
+    </table>
+    <p style="margin-top:16px" id="note"></p>
+    <button type="button" class="again" id="again">もう一度聴く</button>
+  </section>
+</div>
+
+<footer>
+  <p>出典：<a href="https://www.stat.go.jp/data/shakai/2021/pdf/gaiyoua.pdf" rel="noopener">「令和3年社会生活基本調査結果」（総務省統計局）</a>結果の概要 表1-1（全国・10歳以上・週全体・総数）</p>
+  <p>カード：文体「音だけ」／禁じ手「画面なし」／身振り「長押し」</p>
+  <p>制作：Claude（Anthropic）／企画・監修：矢崎裕一</p>
+  <p><a href="../../">トップへ戻る</a></p>
+</footer>
+
+<script type="application/json" id="data">
+{
+  "title": "ある平均的な一日（1440分の配分）",
+  "source": "「令和3年社会生活基本調査結果」（総務省統計局）",
+  "table": "結果の概要 表1-1「男女、行動の種類別生活時間（2016年、2021年）－週全体」総数",
+  "url": "https://www.stat.go.jp/data/shakai/2021/pdf/gaiyoua.pdf",
+  "scope": "全国・10歳以上・週全体・総平均時間",
+  "unit": "分／日",
+  "note": "20行動の合計は1440分。1次活動657分、2次活動407分、3次活動376分。",
+  "activities": [
+    {"id": "sleep", "name": "睡眠", "group": 1, "min": 474},
+    {"id": "care", "name": "身の回りの用事", "group": 1, "min": 84},
+    {"id": "meal", "name": "食事", "group": 1, "min": 99},
+    {"id": "commute", "name": "通勤・通学", "group": 2, "min": 31},
+    {"id": "work", "name": "仕事", "group": 2, "min": 208},
+    {"id": "school", "name": "学業", "group": 2, "min": 38},
+    {"id": "housework", "name": "家事", "group": 2, "min": 87},
+    {"id": "nursing", "name": "介護・看護", "group": 2, "min": 3},
+    {"id": "childcare", "name": "育児", "group": 2, "min": 14},
+    {"id": "shopping", "name": "買い物", "group": 2, "min": 26},
+    {"id": "travel", "name": "移動（通勤・通学を除く）", "group": 3, "min": 22},
+    {"id": "media", "name": "テレビ・ラジオ・新聞・雑誌", "group": 3, "min": 128},
+    {"id": "rest", "name": "休養・くつろぎ", "group": 3, "min": 117},
+    {"id": "study", "name": "学習・自己啓発・訓練（学業以外）", "group": 3, "min": 13},
+    {"id": "hobby", "name": "趣味・娯楽", "group": 3, "min": 48},
+    {"id": "sports", "name": "スポーツ", "group": 3, "min": 13},
+    {"id": "volunteer", "name": "ボランティア活動・社会参加活動", "group": 3, "min": 2},
+    {"id": "social", "name": "交際・付き合い", "group": 3, "min": 10},
+    {"id": "medical", "name": "受診・療養", "group": 3, "min": 7},
+    {"id": "other", "name": "その他", "group": 3, "min": 16}
+  ]
+}
+</script>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ---------- データ ---------- */
+  const DATA = JSON.parse(document.getElementById('data').textContent);
+  const acts = DATA.activities;
+  let cum = 0;
+  acts.forEach(a => {
+    a.L = a.min / 15;            // 鳴らす秒数（15分を1秒に縮める）
+    a.start = cum / 15;
+    cum += a.min;
+    a.end = cum / 15;
+  });
+  const TOTAL = cum / 15;        // 96秒
+  const LOOK = 0.2;              // 先読み（秒）
+
+  /* ---------- 音の設計 ---------- */
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  const lcg = seed => { let s = seed >>> 0; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; };
+
+  // step 秒ごとに notes を巡回して鳴らす
+  function seq(L, step, notes, mk) {
+    const out = [];
+    let i = 0;
+    for (let t = 0; t < L - 1e-6; t += step, i++) {
+      const n = notes[i % notes.length];
+      if (n === null) continue;
+      out.push(mk(n, i, t));
+    }
+    return out;
+  }
+  const pluck = (wave, lp, vel, decay, dur) => (n, i, t) =>
+    ({ kind: 'pluck', t, d: dur, wave, f: mtof(n), lp, vel, decay });
+  const bell = (vel, decay) => (n, i, t) =>
+    ({ kind: 'bell', t, d: decay, f: mtof(n), vel, decay });
+
+  const hobbyNotes = (() => {
+    const scale = [72, 74, 76, 79, 81, 84, 86];
+    const r = lcg(7);
+    let k = 2;
+    const out = [];
+    for (let i = 0; i < 40; i++) {
+      k = Math.max(0, Math.min(scale.length - 1, k + Math.round((r() - 0.5) * 4)));
+      out.push(scale[k]);
+    }
+    return out;
+  })();
+
+  const SOUND = {
+    /* 1次活動：やわらかい正弦波・三角波（低〜中音域） */
+    sleep: L => [{ kind: 'drone', t: 0, d: L, sustain: true, att: 0.4, vel: 0.42,
+      lfo: { hz: 0.13, depth: 0.35 },
+      parts: [
+        { f: mtof(33), type: 'sine', g: 1 },
+        { f: mtof(45), type: 'triangle', g: 0.7 },
+        { f: mtof(45) + 0.35, type: 'sine', g: 0.5 },
+        { f: mtof(52), type: 'sine', g: 0.25 }
+      ] }],
+    care: L => seq(L, 0.7, [62, 66, 69, 66], pluck('triangle', 1400, 0.34, 0.55, 0.7)),
+    meal: L => seq(L, 0.33, [52, 52, 57, null, 52, 57, 59, null], pluck('triangle', 800, 0.42, 0.28, 0.32)),
+
+    /* 2次活動：角のあるパルス（鋸歯・矩形をローパス）。リズムで聞き分ける */
+    commute: L => seq(L, 0.14, [55, 55, 55, 62], pluck('square', 700, 0.15, 0.1, 0.12)),
+    work: L => seq(L, 0.2, [57, 57, 60, 57, 57, 64, 60, 57], pluck('sawtooth', 900, 0.15, 0.13, 0.17)),
+    school: L => seq(L, 0.32, [62, 64, 66, 69, 71], pluck('square', 1500, 0.14, 0.22, 0.28)),
+    housework: L => seq(L, 0.29, [60, 55], pluck('sawtooth', 650, 0.15, 0.22, 0.27)),
+    nursing: L => [{ kind: 'pluck', t: 0, d: L, wave: 'sawtooth', f: mtof(59), lp: 500, vel: 0.13, decay: 0.3 }],
+    childcare: L => seq(L, 0.15, [67, 71, 74, 71, 79, 74], pluck('square', 2200, 0.12, 0.1, 0.14)),
+    shopping: L => seq(L, 0.28, [60, 64, 67, 72, 76, 72], pluck('sawtooth', 1800, 0.13, 0.2, 0.26)),
+
+    /* 3次活動：鐘（非整数倍音）・きらめき（高音域） */
+    travel: L => [{ kind: 'glide', t: 0, d: L, f0: mtof(72), f1: mtof(88), vel: 0.2 }],
+    media: L => [{ kind: 'drone', t: 0, d: L, sustain: true, att: 0.2, vel: 0.2,
+      lfo: { hz: 5, depth: 0.4 },
+      parts: [
+        { f: mtof(76), type: 'sine', g: 1 },
+        { f: mtof(76) + 2.5, type: 'sine', g: 1 },
+        { f: mtof(81), type: 'sine', g: 0.8 },
+        { f: mtof(81) - 3, type: 'sine', g: 0.8 },
+        { f: mtof(84), type: 'sine', g: 0.4 }
+      ] }],
+    rest: L => seq(L, 1.95, [72, 76, 79, 76], bell(0.3, 2.6)),
+    study: L => seq(L, 0.29, [79, 83, 86], bell(0.26, 0.6)),
+    hobby: L => seq(L, 0.16, hobbyNotes, bell(0.2, 0.5)),
+    sports: L => seq(L, 0.087, [88], bell(0.17, 0.12)),
+    volunteer: L => [{ kind: 'bell', t: 0, d: 0.5, f: mtof(91), vel: 0.24, decay: 0.5 }],
+    social: L => seq(L, 0.22, [76, 81, 76], bell(0.26, 0.5)),
+    medical: L => seq(L, 0.23, [81, 81], (n, i, t) => ({ kind: 'beep', t, d: 0.14, f: mtof(n), vel: 0.2, decay: 0.12 })),
+    other: L => [{ kind: 'bell', t: 0, d: 1.5, f: mtof(67), vel: 0.26, decay: 1.5 }]
+  };
+
+  const BELL = [[1, 1, 1], [2.76, 0.45, 0.55], [5.4, 0.2, 0.3], [8.93, 0.1, 0.18]]; // 倍率, 振幅, 減衰倍率
+
+  // 時間軸（秒）に並べた全イベント
+  const timeline = [];
+  acts.forEach((a, i) => {
+    a.events = SOUND[a.id](a.L);
+    a.events.forEach(ev => {
+      timeline.push({ a: i, s: a.start + ev.t, e: Math.min(a.start + ev.t + ev.d, a.end), ev });
+    });
+  });
+
+  /* ---------- 状態（読み取り用に window.__state へ公開） ---------- */
+  const state = window.__state = {
+    pos: 0, total: TOTAL, pressed: false, done: false, index: 0,
+    audio: 'none', voices: acts.map(() => 0), oscillators: 0,
+    previews: acts.map(() => 0), errors: []
+  };
+
+  /* ---------- Web Audio ---------- */
+  let ctx = null, master = null;
+  function ensureAudio() {
+    try {
+      if (!ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        ctx = new AC();
+        const comp = ctx.createDynamicsCompressor();
+        comp.threshold.value = -20; comp.ratio.value = 6; comp.attack.value = 0.005; comp.release.value = 0.2;
+        master = ctx.createGain();
+        master.gain.value = 0.6;
+        master.connect(comp);
+        comp.connect(ctx.destination);
+      }
+      if (ctx.state !== 'running') ctx.resume().catch(() => {});
+      state.audio = ctx.state;
+    } catch (err) { state.errors.push(String(err)); console.error(err); }
+  }
+
+  function makeVoice(seg, ev, t0, t1, resumed) {
+    const dur = t1 - t0;
+    if (dur < 0.01) return;
+    const gate = ctx.createGain();          // 行動の終わり・停止でのクリック防止（短いフェード）
+    const rel = Math.min(0.03, dur * 0.5);
+    gate.gain.setValueAtTime(1, t0);
+    gate.gain.setValueAtTime(1, t1 - rel);
+    gate.gain.linearRampToValueAtTime(0, t1);
+    gate.connect(seg.bus);
+    const stopAt = t1 + 0.03;
+    const osc = (type, f) => {
+      const o = ctx.createOscillator();
+      o.type = type; o.frequency.value = f;
+      o.start(t0); o.stop(stopAt);
+      seg.src.push(o); state.oscillators++;
+      return o;
+    };
+
+    if (ev.kind === 'drone') {
+      const att = resumed ? 0.06 : ev.att;
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0, t0);
+      env.gain.linearRampToValueAtTime(ev.vel, t0 + att);
+      env.connect(gate);
+      const trem = ctx.createGain();
+      trem.gain.value = 1 - ev.lfo.depth;
+      trem.connect(env);
+      const lfo = osc('sine', ev.lfo.hz);
+      const lg = ctx.createGain();
+      lg.gain.value = ev.lfo.depth;
+      lfo.connect(lg); lg.connect(trem.gain);
+      const sum = ev.parts.reduce((s, p) => s + p.g, 0);
+      ev.parts.forEach(p => {
+        const g = ctx.createGain();
+        g.gain.value = p.g / sum;
+        osc(p.type, p.f).connect(g);
+        g.connect(trem);
+      });
+    } else if (ev.kind === 'pluck') {
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0.0001, t0);
+      env.gain.linearRampToValueAtTime(ev.vel, t0 + 0.008);
+      env.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.008 + ev.decay);
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = ev.lp; lp.Q.value = 0.7;
+      osc(ev.wave, ev.f).connect(lp);
+      lp.connect(env); env.connect(gate);
+    } else if (ev.kind === 'bell') {
+      const parts = BELL.filter(p => ev.f * p[0] < 12000);
+      const sum = parts.reduce((s, p) => s + p[1], 0);
+      parts.forEach(p => {
+        const g = ctx.createGain();
+        const peak = ev.vel * p[1] / sum;
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.linearRampToValueAtTime(peak, t0 + 0.004);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.004 + ev.decay * p[2]);
+        osc('sine', ev.f * p[0]).connect(g);
+        g.connect(gate);
+      });
+    } else if (ev.kind === 'glide') {
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0, t0);
+      env.gain.linearRampToValueAtTime(ev.vel, t0 + 0.04);
+      env.connect(gate);
+      [[1, 1], [2.01, 0.3]].forEach(([r, a]) => {
+        const o = osc('sine', ev.f0 * r);
+        o.frequency.setValueAtTime(ev.f0 * r, t0);
+        o.frequency.exponentialRampToValueAtTime(ev.f1 * r, t0 + dur * 0.95);
+        const g = ctx.createGain();
+        g.gain.value = a / 1.3;
+        o.connect(g); g.connect(env);
+      });
+    } else if (ev.kind === 'beep') {
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0.0001, t0);
+      env.gain.linearRampToValueAtTime(ev.vel, t0 + 0.005);
+      env.gain.setValueAtTime(ev.vel, t0 + 0.06);
+      env.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.06 + ev.decay * 0.5);
+      osc('sine', ev.f).connect(env);
+      env.connect(gate);
+    }
+  }
+
+  function newSeg(a0, p0) {
+    const bus = ctx.createGain();
+    bus.connect(master);
+    return { bus, src: [], a0, p0, next: 0 };
+  }
+  function stopSeg(seg) {
+    if (!seg || !ctx) return;
+    const now = ctx.currentTime;
+    try { seg.bus.gain.setTargetAtTime(0, now, 0.012); } catch (e) {}
+    seg.src.forEach(o => { try { o.stop(now + 0.08); } catch (e) {} });
+    setTimeout(() => { try { seg.bus.disconnect(); } catch (e) {} }, 400);
+  }
+
+  /* ---------- 進行 ---------- */
+  const $ = s => document.querySelector(s);
+  const pad = $('#pad'), line = $('#line'), live = $('#live');
+  const answer = $('#answer'), peek = $('#peek'), answerH = $('#answer-h');
+
+  let pos = 0, seg = null, timer = null, pressBy = null, pointerId = null;
+  const clock = () => ctx ? ctx.currentTime : performance.now() / 1000;
+  const audioReady = () => !ctx || ctx.state === 'running';
+
+  function startSeg() {
+    const a0 = clock() + (ctx ? 0.03 : 0);
+    seg = ctx ? newSeg(a0, pos) : { bus: null, src: [], a0, p0: pos, next: 0 };
+    let k = 0;
+    while (k < timeline.length && timeline[k].s < pos - 1e-9) k++;
+    seg.next = k;
+    // 途中から再開するとき、持続音だけは鳴らし直す
+    for (let i = 0; i < k; i++) {
+      const it = timeline[i];
+      if (it.ev.sustain && it.e > pos + 0.05) play(it, true);
+    }
+  }
+  const toAudio = p => seg.a0 + (p - seg.p0);
+  function play(it, resumed) {
+    if (!ctx) return;
+    const s = toAudio(Math.max(it.s, pos)), e = toAudio(it.e);
+    if (e - s < 0.01) return;
+    try {
+      makeVoice(seg, it.ev, s, e, resumed);
+      state.voices[it.a]++;
+    } catch (err) { state.errors.push(String(err)); console.error(err); }
+  }
+
+  function tick() {
+    if (!state.pressed) return;
+    try {
+      if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
+      if (!seg) {
+        if (!audioReady()) return;
+        startSeg();
+      }
+      pos = Math.min(TOTAL, seg.p0 + Math.max(0, clock() - seg.a0));
+      const horizon = pos + LOOK;
+      while (seg.next < timeline.length && timeline[seg.next].s < horizon) {
+        play(timeline[seg.next]);
+        seg.next++;
+      }
+      syncState();
+      if (pos >= TOTAL) finish();
+    } catch (err) { state.errors.push(String(err)); console.error(err); }
+  }
+
+  function syncState() {
+    state.pos = pos;
+    state.done = done;
+    let idx = acts.length - 1;
+    for (let i = 0; i < acts.length; i++) if (pos < acts[i].end) { idx = i; break; }
+    state.index = idx;
+    if (ctx) state.audio = ctx.state;
+  }
+
+  let done = false;
+
+  function press(by) {
+    if (done || state.pressed) return;
+    ensureAudio();
+    stopPreview();
+    state.pressed = true; pressBy = by;
+    pad.classList.add('on');
+    pad.setAttribute('aria-pressed', 'true');
+    line.classList.add('quiet');
+    timer = setInterval(tick, 25);
+    tick();
+  }
+
+  function halt() {
+    if (!state.pressed) return;
+    state.pressed = false; pressBy = null; pointerId = null;
+    clearInterval(timer); timer = null;
+    if (seg) {
+      pos = Math.min(TOTAL, Math.max(pos, seg.p0 + Math.max(0, clock() - seg.a0)) );
+      if (!done && pos >= TOTAL) pos = TOTAL;
+      stopSeg(seg);
+      seg = null;
+    }
+    pad.classList.remove('on');
+    pad.setAttribute('aria-pressed', 'false');
+    line.classList.remove('quiet');
+    if (!done && pos > 0) line.textContent = '押すと、続きから。';
+    syncState();
+  }
+
+  function finish() {
+    done = true;
+    pos = TOTAL;
+    halt();
+    pad.setAttribute('aria-disabled', 'true');
+    line.textContent = '一日が終わった。';
+    openAnswer(true);
+    live.textContent = '聴き終えました。答え合わせを表示しました。';
+    syncState();
+  }
+
+  function reset() {
+    stopPreview();
+    halt();
+    done = false; pos = 0;
+    pad.removeAttribute('aria-disabled');
+    line.textContent = '長押しで、一日が鳴る。';
+    openAnswer(false);
+    syncState();
+    window.scrollTo(0, 0);
+    pad.focus({ preventScroll: true });
+  }
+
+  /* ---------- 入力（Pointer Events） ---------- */
+  function inside(e) {
+    const r = pad.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+    return Math.hypot(dx, dy) <= r.width / 2 + 1;
+  }
+  pad.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (pointerId !== null || state.pressed) return;
+    e.preventDefault();
+    pointerId = e.pointerId;
+    try { pad.setPointerCapture(e.pointerId); } catch (err) {}
+    press('pointer');
+  });
+  pad.addEventListener('pointermove', e => {
+    if (e.pointerId === pointerId && pressBy === 'pointer' && !inside(e)) halt();
+  });
+  pad.addEventListener('pointerleave', e => { if (e.pointerId === pointerId && pressBy === 'pointer') halt(); });
+  const end = e => {
+    if (e.pointerId === pointerId && pressBy === 'pointer') halt();
+    if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});   // iOS など、離したときに許可される環境のため
+  };
+  pad.addEventListener('pointerup', end);
+  pad.addEventListener('pointercancel', end);
+  pad.addEventListener('lostpointercapture', end);
+  pad.addEventListener('contextmenu', e => e.preventDefault());
+  pad.addEventListener('selectstart', e => e.preventDefault());
+  pad.addEventListener('dragstart', e => e.preventDefault());
+
+  // キーボード：スペースキーを押している間
+  const spaceTarget = t => t === pad || t === document.body || t === document.documentElement;
+  document.addEventListener('keydown', e => {
+    if (e.code !== 'Space' || !spaceTarget(e.target)) return;
+    e.preventDefault();
+    if (!e.repeat) press('key');
+  });
+  document.addEventListener('keyup', e => {
+    if (e.code !== 'Space' || !spaceTarget(e.target)) return;
+    e.preventDefault();
+    if (pressBy === 'key') halt();
+  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { halt(); stopPreview(); } });
+  window.addEventListener('blur', () => halt());
+
+  /* ---------- 答え合わせ ---------- */
+  const fmtSec = m => (m / 15).toFixed(1) + '秒';
+  const fmtTime = m => Math.floor(m / 60) + '時間' + (m % 60) + '分';
+  const rows = $('#rows');
+  acts.forEach((a, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><button type="button" class="row-btn"><span class="tag">' + a.group + '次</span><span></span></button></td>' +
+      '<td class="num">' + fmtSec(a.min) + '</td><td class="num">' + fmtTime(a.min) + '</td>';
+    const btn = tr.querySelector('button');
+    btn.lastElementChild.textContent = a.name;
+    btn.setAttribute('aria-label', a.name + '、' + fmtSec(a.min) + '、' + fmtTime(a.min) + '。押すと1秒だけ聴ける');
+    tr.addEventListener('click', e => { if (e.target.closest('button') !== btn) btn.focus({ preventScroll: true }); preview(i, tr); });
+    tr.style.cursor = 'pointer';
+    rows.appendChild(tr);
+  });
+  const sumMin = acts.reduce((s, a) => s + a.min, 0);
+  $('#total').innerHTML = '<tr><td>合計</td><td class="num">' + fmtSec(sumMin) + '</td><td class="num">' + fmtTime(sumMin) + '</td></tr>';
+  const roundedSum = acts.reduce((s, a) => s + Math.round(a.min / 15 * 10), 0);
+  $('#note').textContent =
+    'この並びは、時刻の順ではなく、統計表（表1-1）の並び順です。15分を1秒に縮めたので、1440分が96秒になります。' +
+    '音色は、1次活動＝やわらかい正弦波・三角波、2次活動＝角のあるパルス、3次活動＝鐘やきらめき。' +
+    '短い行動は、試聴では余韻まで1秒ぶん鳴らします。' +
+    (roundedSum !== Math.round(sumMin / 15 * 10) ? '秒数は小数1桁に丸めているため、各行の合計は96.0秒とわずかにずれます。' : '');
+
+  function openAnswer(open) {
+    answer.hidden = !open;
+    peek.setAttribute('aria-expanded', String(open));
+    peek.textContent = open ? '答え合わせを閉じる' : '答え合わせを先に見る';
+    peek.hidden = open && done;
+    if (open && done) {
+      answerH.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      answerH.focus({ preventScroll: true });
+    }
+  }
+  peek.addEventListener('click', () => openAnswer(answer.hidden));
+  $('#again').addEventListener('click', reset);
+
+  /* ---------- 試聴（1秒） ---------- */
+  let pv = null, pvTimer = null, pvRow = null;
+  function stopPreview() {
+    if (pv) { stopSeg(pv); pv = null; }
+    clearTimeout(pvTimer);
+    if (pvRow) { pvRow.classList.remove('playing'); pvRow = null; }
+  }
+  function preview(i, tr) {
+    halt();
+    ensureAudio();
+    stopPreview();
+    if (!ctx) return;
+    try {
+      const a = acts[i];
+      a.pv = a.pv || SOUND[a.id](Math.max(a.L, 1));
+      pv = newSeg(ctx.currentTime + 0.03, 0);
+      a.pv.forEach(ev => {
+        if (ev.t >= 1) return;
+        const e = Math.min(ev.t + ev.d, 1);
+        makeVoice(pv, ev, pv.a0 + ev.t, pv.a0 + e, false);
+        state.previews[i]++;
+      });
+      pvRow = tr; tr.classList.add('playing');
+      pvTimer = setTimeout(stopPreview, 1100);
+    } catch (err) { state.errors.push(String(err)); console.error(err); }
+  }
+
+  syncState();
+})();
+</script>
+</body>
+</html>
