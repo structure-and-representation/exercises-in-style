@@ -1,0 +1,31 @@
+{
+  "title": "ある平均的な一日（1440分の配分）",
+  "source": "「令和3年社会生活基本調査結果」（総務省統計局）",
+  "table": "結果の概要 表1-1「男女、行動の種類別生活時間（2016年、2021年）－週全体」総数",
+  "url": "https://www.stat.go.jp/data/shakai/2021/pdf/gaiyoua.pdf",
+  "scope": "全国・10歳以上・週全体・総平均時間",
+  "unit": "分／日",
+  "note": "20行動の合計は1440分。1次活動657分、2次活動407分、3次活動376分。",
+  "activities": [
+    {"id": "sleep", "name": "睡眠", "group": 1, "min": 474},
+    {"id": "care", "name": "身の回りの用事", "group": 1, "min": 84},
+    {"id": "meal", "name": "食事", "group": 1, "min": 99},
+    {"id": "commute", "name": "通勤・通学", "group": 2, "min": 31},
+    {"id": "work", "name": "仕事", "group": 2, "min": 208},
+    {"id": "school", "name": "学業", "group": 2, "min": 38},
+    {"id": "housework", "name": "家事", "group": 2, "min": 87},
+    {"id": "nursing", "name": "介護・看護", "group": 2, "min": 3},
+    {"id": "childcare", "name": "育児", "group": 2, "min": 14},
+    {"id": "shopping", "name": "買い物", "group": 2, "min": 26},
+    {"id": "travel", "name": "移動（通勤・通学を除く）", "group": 3, "min": 22},
+    {"id": "media", "name": "テレビ・ラジオ・新聞・雑誌", "group": 3, "min": 128},
+    {"id": "rest", "name": "休養・くつろぎ", "group": 3, "min": 117},
+    {"id": "study", "name": "学習・自己啓発・訓練（学業以外）", "group": 3, "min": 13},
+    {"id": "hobby", "name": "趣味・娯楽", "group": 3, "min": 48},
+    {"id": "sports", "name": "スポーツ", "group": 3, "min": 13},
+    {"id": "volunteer", "name": "ボランティア活動・社会参加活動", "group": 3, "min": 2},
+    {"id": "social", "name": "交際・付き合い", "group": 3, "min": 10},
+    {"id": "medical", "name": "受診・療養", "group": 3, "min": 7},
+    {"id": "other", "name": "その他", "group": 3, "min": 16}
+  ]
+}

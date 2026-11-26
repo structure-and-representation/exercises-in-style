@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>そのまま ― データの文体練習 第1番</title>
+<meta name="description" content="ある平均的な一日、1440分を一本の帯にしました。帯を引いた長さが、時間です。">
+<style>
+  :root {
+    --paper: #f4f1ea; --ink: #1d1d1b; --gray: #6b6860; --line: #d8d3c6; --red: #c8452f;
+    --mincho: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+    --gothic: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--mincho); line-height: 1.8; overflow-x: hidden; }
+  header, main > section, footer { max-width: 44rem; margin: 0 auto; padding: 0 1.25rem; }
+  header { padding-top: 2.5rem; }
+  .series { font-family: var(--gothic); font-size: .78rem; letter-spacing: .12em; color: var(--gray); margin: 0; }
+  h1 { font-size: clamp(2rem, 7vw, 3.2rem); font-weight: 500; margin: .2rem 0 1rem; letter-spacing: .04em; }
+  .lead { margin: 0 0 2rem; font-size: 1.02rem; }
+
+  /* 読み取り窓 */
+  .now { height: 5.5rem; display: flex; align-items: flex-end; justify-content: center; text-align: center; padding: 0 1rem .6rem; }
+  .now span { font-size: clamp(1.4rem, 5.4vw, 2.2rem); letter-spacing: .06em; }
+  .stage { position: relative; height: 148px; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; outline: none; }
+  .stage:active { cursor: grabbing; }
+  .stage:focus-visible { box-shadow: inset 0 0 0 2px var(--ink); }
+  .band { position: absolute; top: 24px; left: 50%; height: 100px; display: flex; will-change: transform; }
+  .seg { height: 100%; flex: none; position: relative; overflow: hidden; border-right: 1px solid var(--paper); }
+  .seg b { position: absolute; left: 10px; bottom: 8px; font-family: var(--gothic); font-weight: 400; font-size: .78rem; white-space: nowrap; }
+  .g1 { background: #2b2a27; color: #f4f1ea; } .g1.alt { background: #3d3b37; }
+  .g2 { background: #8d8779; color: #fff; }   .g2.alt { background: #a09a8c; color: #1d1d1b; }
+  .g3 { background: #cdc7b8; color: #1d1d1b; } .g3.alt { background: #ded9cb; }
+  .notches { position: absolute; top: 124px; left: 50%; height: 8px; will-change: transform;
+    background-image: linear-gradient(to right, var(--gray) 1px, transparent 1px); background-size: 180px 100%; }
+  .needle { position: absolute; left: 50%; top: 8px; bottom: 6px; width: 2px; margin-left: -1px; background: var(--red); pointer-events: none; }
+  .needle::before { content: ""; position: absolute; left: -5px; top: -2px; border: 6px solid transparent; border-top-color: var(--red); }
+  .hint { text-align: center; font-family: var(--gothic); font-size: .82rem; color: var(--gray); min-height: 1.6em; margin: .6rem 0 0; }
+
+  section.answer { margin-top: 3rem; }
+  h2 { font-size: 1.15rem; font-weight: 500; letter-spacing: .08em; border-top: 1px solid var(--ink); padding-top: .8rem; margin: 0 0 .6rem; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--gothic); font-size: .9rem; }
+  th, td { text-align: left; padding: .42rem .3rem; border-bottom: 1px solid var(--line); font-weight: 400; vertical-align: middle; }
+  td.t, th.t { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  td.bar { width: 34%; }
+  td.bar i { display: block; height: 8px; background: var(--ink); }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover td, tbody tr:focus td { background: #ebe7dc; }
+  tr.grp { cursor: default; }
+  tr.grp:hover th { background: none; }
+  tr.grp th { font-size: .74rem; color: var(--gray); letter-spacing: .1em; padding-top: 1rem; }
+  tfoot td { border-bottom: 0; border-top: 1px solid var(--ink); }
+  .note { font-size: .86rem; color: var(--gray); }
+  button.link { font: inherit; font-family: var(--gothic); font-size: .85rem; color: var(--gray); background: none; border: 0; border-bottom: 1px solid currentColor; padding: 0; cursor: pointer; }
+  footer { margin-top: 3rem; padding-bottom: 4rem; font-family: var(--gothic); font-size: .8rem; color: var(--gray); line-height: 1.9; }
+  footer p { margin: .3rem 0; }
+  a { color: inherit; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <p class="series">データの文体練習　第1番</p>
+  <h1>そのまま</h1>
+  <p class="lead">ある平均的な一日を、一本の帯にしました。帯を左へ引いてください。引いた長さが、時間です。</p>
+</header>
+
+<main>
+  <div class="now" aria-live="polite"><span id="now">睡眠</span></div>
+  <div class="stage" id="stage" tabindex="0" role="slider" aria-label="一日の帯。左右の矢印キーで動かせます" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="0">
+    <div class="band" id="band"></div>
+    <div class="notches" id="notches"></div>
+    <div class="needle"></div>
+  </div>
+  <p class="hint" id="hint">← 帯を引く（下の刻みは1時間ごと）</p>
+
+  <section class="answer">
+    <p id="early"><button class="link" id="open">答え合わせを先に見る</button></p>
+    <div id="answer" hidden>
+      <h2>答え合わせ</h2>
+      <table>
+        <thead><tr><th>行動</th><th class="t">時間</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+        <tfoot><tr><td>合計</td><td class="t" id="total"></td><td></td></tr></tfoot>
+      </table>
+      <p class="note">行を押すと、帯がその行動の先頭へ動きます。帯の並びは時刻の順ではなく、統計表の並び順です。値は全国・10歳以上の総平均時間（週全体）で、その行動をしなかった人も含めて平均しています。</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>出典：「令和3年社会生活基本調査結果」（総務省統計局）<a href="https://www.stat.go.jp/data/shakai/2021/pdf/gaiyoua.pdf">結果の概要</a> 表1-1（全国・10歳以上・週全体・総数）</p>
+  <p>カード：文体なし／禁じ手なし／身振り「なぞる」。この連作の基準になる一作です。</p>
+  <p>着想：レーモン・クノー『文体練習』</p>
+  <p>制作：Claude（Anthropic）／企画・監修：矢崎裕一</p>
+  <p><a href="../../">連作のトップへ</a></p>
+</footer>
+
+<script>
+const DATA = [
+  ["睡眠",1,474],["身の回りの用事",1,84],["食事",1,99],
+  ["通勤・通学",2,31],["仕事",2,208],["学業",2,38],["家事",2,87],["介護・看護",2,3],["育児",2,14],["買い物",2,26],
+  ["移動（通勤・通学を除く）",3,22],["テレビ・ラジオ・新聞・雑誌",3,128],["休養・くつろぎ",3,117],
+  ["学習・自己啓発・訓練（学業以外）",3,13],["趣味・娯楽",3,48],["スポーツ",3,13],
+  ["ボランティア活動・社会参加活動",3,2],["交際・付き合い",3,10],["受診・療養",3,7],["その他",3,16]
+].map(([name, group, min]) => ({ name, group, min }));
+const GROUPS = { 1: "1次活動（生理的に必要な活動）", 2: "2次活動（義務的な性格の強い活動）", 3: "3次活動（自由に使える時間の活動）" };
+const TOTAL = DATA.reduce((s, d) => s + d.min, 0);   // 1440
+const PX = 3;                                          // 1分 = 3px
+let acc = 0; DATA.forEach(d => { d.start = acc; acc += d.min; });
+
+const $ = id => document.getElementById(id);
+const band = $("band"), notches = $("notches"), stage = $("stage"), now = $("now"), hint = $("hint");
+const hm = m => (Math.floor(m / 60) ? Math.floor(m / 60) + "時間" : "") + (m % 60 || !Math.floor(m / 60) ? (m % 60) + "分" : "");
+
+DATA.forEach((d, i) => {
+  const s = document.createElement("div");
+  s.className = "seg g" + d.group + (i % 2 ? " alt" : "");
+  s.style.width = d.min * PX + "px";
+  if (d.min * PX > d.name.length * 13 + 16) { const b = document.createElement("b"); b.textContent = d.name; s.appendChild(b); }
+  band.appendChild(s);
+});
+notches.style.width = TOTAL * PX + 1 + "px";
+
+const state = window.__state = { pos: 0, max: 0, done: false };
+function at(m) { return DATA.find(d => m < d.start + d.min) || DATA[DATA.length - 1]; }
+function render() {
+  const x = -state.pos * PX;
+  band.style.transform = notches.style.transform = "translateX(" + x + "px)";
+  const d = at(Math.min(state.pos, TOTAL - .001));
+  if (now.textContent !== d.name) now.textContent = d.name;
+  stage.setAttribute("aria-valuenow", Math.round(state.pos));
+  stage.setAttribute("aria-valuetext", d.name);
+}
+function move(to) {
+  state.pos = Math.max(0, Math.min(TOTAL, to));
+  state.max = Math.max(state.max, state.pos);
+  if (state.pos > 30 && !state.done) hint.textContent = "そのまま引き続ける";
+  if (state.pos >= TOTAL && !state.done) finish();
+  render();
+}
+function finish() {
+  state.done = true;
+  hint.textContent = "ここまでが一日です。";
+  showAnswer(true);
+}
+function showAnswer(scroll) {
+  $("answer").hidden = false; $("early").hidden = true;
+  if (scroll) $("answer").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+}
+
+// 身振り：なぞる（引く）
+let drag = null;
+stage.addEventListener("pointerdown", e => { drag = { x: e.clientX, pos: state.pos }; stage.setPointerCapture(e.pointerId); });
+stage.addEventListener("pointermove", e => { if (drag) move(drag.pos - (e.clientX - drag.x) / PX); });
+["pointerup", "pointercancel"].forEach(t => stage.addEventListener(t, () => { drag = null; }));
+stage.addEventListener("wheel", e => { e.preventDefault(); move(state.pos + (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) / PX); }, { passive: false });
+stage.addEventListener("keydown", e => {
+  const step = e.shiftKey ? 60 : 5;
+  if (e.key === "ArrowRight") { move(state.pos + step); e.preventDefault(); }
+  else if (e.key === "ArrowLeft") { move(state.pos - step); e.preventDefault(); }
+  else if (e.key === "Home") { move(0); e.preventDefault(); }
+  else if (e.key === "End") { move(TOTAL); e.preventDefault(); }
+});
+
+// 答え合わせ
+const rows = $("rows"), maxMin = Math.max(...DATA.map(d => d.min));
+let g = 0;
+DATA.forEach(d => {
+  if (d.group !== g) { g = d.group; const tr = document.createElement("tr"); tr.className = "grp"; tr.innerHTML = '<th colspan="3"></th>'; tr.firstChild.textContent = GROUPS[g]; rows.appendChild(tr); }
+  const tr = document.createElement("tr"); tr.tabIndex = 0;
+  tr.innerHTML = '<td></td><td class="t"></td><td class="bar"><i></i></td>';
+  tr.children[0].textContent = d.name; tr.children[1].textContent = hm(d.min);
+  tr.querySelector("i").style.width = Math.max(1, d.min / maxMin * 100) + "%";
+  const go = () => { move(d.start); stage.scrollIntoView({ block: "center" }); };
+  tr.addEventListener("click", go);
+  tr.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  rows.appendChild(tr);
+});
+$("total").textContent = hm(TOTAL) || "24時間";
+$("open").addEventListener("click", () => showAnswer(false));
+render();
+</script>
+</body>
+</html>

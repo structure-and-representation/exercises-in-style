@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>データの文体練習／記譜法を借りる</title>
+<meta name="description" content="同じデータを語り直す「データの文体練習」と、既存の記譜法でデータを書く「記譜法を借りる」。操作して読むデータ可視化の連作です。">
+<style>
+  :root { --paper:#f4f1ea; --ink:#1d1d1b; --gray:#6b6860; --line:#d8d3c6; --red:#c8452f;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif; --gothic:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--mincho); line-height:1.9; }
+  .wrap { max-width: 60rem; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
+  .kicker { font-family:var(--gothic); font-size:.78rem; letter-spacing:.14em; color:var(--gray); margin:0; }
+  h1 { font-weight:500; font-size:clamp(1.9rem,6.4vw,3.4rem); line-height:1.35; letter-spacing:.04em; margin:.4rem 0 1.4rem; }
+  h1 span { display:block; }
+  .lead { max-width: 38rem; margin: 0 0 3rem; }
+  .wings { display:grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 2.5rem 3rem; }
+  h2 { font-weight:500; font-size:1.3rem; letter-spacing:.08em; border-top:1px solid var(--ink); padding-top:.9rem; margin:0 0 .3rem; }
+  .wings p { margin:.2rem 0 1rem; font-size:.95rem; }
+  .rule { font-family:var(--gothic); font-size:.78rem; color:var(--gray); }
+  ol { list-style:none; margin:0; padding:0; }
+  li a { display:grid; grid-template-columns: 3.2rem 1fr; gap:.2rem 1rem; padding:.9rem 0; border-top:1px solid var(--line); color:inherit; text-decoration:none; }
+  li a:hover b, li a:focus b { color:var(--red); }
+  li i { font-style:normal; font-family:var(--gothic); font-size:.8rem; color:var(--gray); padding-top:.45rem; font-variant-numeric:tabular-nums; }
+  li b { font-weight:500; font-size:1.35rem; letter-spacing:.05em; }
+  li small { grid-column:2; font-family:var(--gothic); font-size:.8rem; color:var(--gray); line-height:1.7; }
+  .next { font-family:var(--gothic); font-size:.8rem; color:var(--gray); border-top:1px solid var(--line); padding-top:.9rem; margin:0; }
+  footer { margin-top:4rem; font-family:var(--gothic); font-size:.8rem; color:var(--gray); line-height:1.9; }
+  footer p { margin:.2rem 0; } a { color:inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">操作して読むデータ可視化の連作</p>
+  <h1><span>データの文体練習</span><span>記譜法を借りる</span></h1>
+  <p class="lead">二つの連作は鏡の関係にあります。一方はデータを一つに決めて語り方を変え、もう一方は形を借りてきて、その形に合うデータを選びます。どの作品も、一つの身振りで読みます。数字は最後に出てきます。</p>
+
+  <div class="wings">
+    <section>
+      <h2>データの文体練習</h2>
+      <p>ある平均的な一日、1440分。同じデータを99通りに語り直します。</p>
+      <p class="rule">1作ごとに、文体・禁じ手・身振りのカードを1枚ずつ引いて作ります。</p>
+      <ol>
+        <li><a href="style/001-sonomama/"><i>第1番</i><b>そのまま</b><small>身振り：なぞる　｜　帯を引いた長さが、時間になる</small></a></li>
+        <li><a href="style/002-oto-dake/"><i>第2番</i><b>音だけ</b><small>身振り：長押し　｜　押しているあいだ、一日が鳴る（音が出ます）</small></a></li>
+      </ol>
+      <p class="next">99作のうち2作</p>
+    </section>
+    <section>
+      <h2>記譜法を借りる</h2>
+      <p>楽譜、棋譜、編み図、時刻表。記譜法がもともと持っている構造で、データを書きます。</p>
+      <p class="rule">記譜法の規則は変えません。読める人が、そのまま読めるように書きます。</p>
+      <ol>
+        <li><a href="notation/001-amizu/"><i>第1番</i><b>編み図</b><small>身振り：編み進める　｜　日本の人口の100年を、増し目と減らし目で編む</small></a></li>
+      </ol>
+      <p class="next">目録24種のうち1種</p>
+    </section>
+  </div>
+
+  <footer>
+    <p>制作：Claude（Anthropic）／企画・監修：矢崎裕一</p>
+    <p>着想：レーモン・クノー『文体練習』。約束ごとと台帳は<a href="https://github.com/structure-and-representation/exercises-in-style">リポジトリ</a>にあります。</p>
+  </footer>
+</div>
+</body>
+</html>
